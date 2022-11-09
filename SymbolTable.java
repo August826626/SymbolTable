@@ -1,10 +1,13 @@
 public class SymbolTable {
 
+	// how to make generic?
+
 	public SymbolTable() {
+		
 	}
 	
 	public void put(Key k, Value v) { //need second method because we need to fix links
-		root = put(root, k, v);
+		int root = put(root, k, v); //int?
 	}
 	
 	private Node put(Node x, Key k, Value v) {
@@ -38,14 +41,14 @@ public class SymbolTable {
 		return x;
 	}
 	
-	public Node floor(Node x) { //greatest node that is less
+	//public Node floor(Node x) { //greatest node that is less
 		
-	}
+	//}
 
 	
-	public Node ceiling(Node x) { //smallest node that is greater
+	//public Node ceiling(Node x) { //smallest node that is greater
 	
-	}
+	//}
 	
 	public Key select(int i) { //the kth smallest key (in the whole tree)
 		
@@ -56,18 +59,29 @@ public class SymbolTable {
 	private Node select(Node x, int i) {
 		if (x == null) return null;
 		
-		int s = size(x.left);
-		if (s == k) {
+		int s = size(x.left); //keys less than x + 1
+		if (s == i) {
 			return x.k;
-		} else if (s < k) {
-			return select(x.right, k);
+		} else if (s < i) {
+			return select(x.right, i);
 		} else if (s > k) {
-			return select(x.left, k);
+			return select(x.left, i-s-1); //no longer have to satisfy parent.left, since we are subtracting it
 		}
 	}
 	
-	private int size(Node x) { //number of nodes in a tree
+	private int size(Node x) { //number of nodes less than current node?
+		if (x == null) {
+			return 0;
+		} else {
+			return size(x.left);
+		}
 		
-		
+	}
+	
+	public static void main(String[] args) {
+		SymbolTable test = new SymbolTable();
+		test.put(s, 1);
+		test.put(e, 2);
+		test.put(x, 3);
 	}
 }
