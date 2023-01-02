@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 
-public class SymbolTable<Key extends Comparable<Key>, value> { //specify generics
-
+public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generics
+	final boolean RED = true;
+	final boolean BLACK = false;
+	public Node root;
 	// how to make generic?
 
 	public SymbolTable() {
@@ -9,8 +11,9 @@ public class SymbolTable<Key extends Comparable<Key>, value> { //specify generic
 	}
 	
 	public void put(Key k, Value v) { //need second method because we need to fix links
-		int root = put(root, k, v); //int?
-		root.add();
+		root = put(root, k, v); //int?
+		root.color = BLACK;
+		root.add(); //increase size
 	}
 	
 	private Node put(Node x, Key k, Value v) {
@@ -18,21 +21,92 @@ public class SymbolTable<Key extends Comparable<Key>, value> { //specify generic
 			return new Node(k, v); //if nothing there, attach
 		}
 		
-		int comp = k.compareTo(x.k);
-		if (comp == 0) { //if same
-			return null;
-		} else if (comp < 0) { //if less than
-			x.left.add();
+		int comp = k.compareTo(x.key);
+		if (comp < 0) { //if less than
 			x.left = put(x.left, k, v); //search left tree
-			return x; //go back up and fix link
+			//return x.left;
 		} else if (comp > 0) { //if greater than
-			x.right.add();
-			x.right = put(x.right, k, v);
-			return x;			
+			x.right = put(x.right, k, v); //search right tree
+			//return x.right;
+		} else { //if same
+			x.value = v; //change value
+		}
+		
+		/* if (isRed(x.right) && !isRed(x.left)) { //why does this work?
+			leftRot(x.left);
+		}
+		if (isRed(x.left) && !isRed(x.left.left)) {
+			rightRot(x.left);
+		}
+		if (isRed(x.left) && isRed(x.right)) {
+			flipColors(x);
+		} */
+		
+		return x;
+		
+		
+		//x.add(); //where should I put this?
+	}
+	
+	
+	public Value get(Key k) {
+		return get(root, k);
+	}
+	
+	private Value get(Node x, Key k) {
+		if (x == null) return null; //if hit dead end
+		
+		int comp = k.compareTo(x.key);
+		
+		if (comp < 0) {
+			return get(x.left, k);
+		} else if (comp > 0) {
+			return get(x.right, k);
+		} else {
+			return x.value;
+		}
+
+	}
+	
+	public Node leftRot(Node h) {
+		Node x = h.right;
+		h.right = x.left;
+		x.left = h;
+		
+		x.color = h.color;
+		h.color = RED;
+		
+		return x;
+	}
+	
+	public Node rightRot(Node h) {
+		Node x = h.left;
+		h.left = x.right;
+		x.right = h;
+		
+		x.color = h.color;
+		h.color = RED;
+		
+		return x;
+	}
+	
+	private boolean isRed(Node h) {
+		return h.color;
+	}
+	
+	private void flipColors(Node h) { //is there a more concise way to do this?
+		if (h.color == RED) {
+			h.color = BLACK;
+			h.left.color = RED;
+			h.right.color = RED;
+		} else {
+			h.color = RED;
+			h.left.color = BLACK;
+			h.right.color = BLACK;
 		}
 	}
 	
-	private Node max (Node x) {
+	/* private Node max (Node x) {
 		while (x.right != null) {//as long as there is a child
 			x = x.right; //search right child
 		}
@@ -116,30 +190,46 @@ public class SymbolTable<Key extends Comparable<Key>, value> { //specify generic
 		
 	}
 	
+	*/
+	
 	private class Node implements Comparable<Node> {
-		public Key k; // fields from the innerclass are public throughout the file
-		public Value v;
-		public Node parent;
+		public Key key; // fields from the innerclass are public throughout the file
+		public Value value;
+		public Node left;
+		public Node right;
+		public boolean color;
 		public int size;
 		
 		public Node(Key k, Value v) {
 			this.key = k;
 			this.value = v;
+			this.color = RED;
 		}
 		
 		public int compareTo(Node that) {
-			return this.k.compareTo(that.k);
+			return this.key.compareTo(that.key);
 		}
 		
 		public void add() {
 			size += 1;
 		}
-	}
+	} 
 	
 	public static void main(String[] args) {
 		SymbolTable test = new SymbolTable();
-		test.put(s, 1);
-		test.put(e, 2);
-		test.put(x, 3);
+		test.put("s", 1);
+		test.put("e", 2);
+		test.put("a", 3);
+		test.put("r", 4);
+		test.put("c", 5);
+		test.put("h", 6);
+		test.put("e", 7);
+		test.put("x", 8);
+		test.put("a", 9);
+		test.put("m", 10);
+		System.out.println(test.get("s"));
+		System.out.println(test.get("e"));
+		System.out.println(test.get("a"));
+		System.out.println(test.get("m"));
 	}
 }
