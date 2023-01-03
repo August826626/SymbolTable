@@ -23,11 +23,11 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		
 		int comp = k.compareTo(x.key);
 		if (comp < 0) { //if less than
+            x.add();
 			x.left = put(x.left, k, v); //search left tree
-			//return x.left;
 		} else if (comp > 0) { //if greater than
+            x.add();
 			x.right = put(x.right, k, v); //search right tree
-			//return x.right;
 		} else { //if same
 			x.value = v; //change value
 		}
@@ -52,7 +52,6 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 			flipColors(x);
         }
     }
-	
 	
 	public Value get(Key k) {
 		return get(root, k);
@@ -81,6 +80,12 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		x.color = h.color;
 		h.color = RED;
 		
+        int temp = x.size;
+        x.size = h.size;
+        h.size = 1 + size(h.left) + size(h.right); //h size changing but it's childrens' sizes haven't
+        System.out.println("Left rotation");
+        System.out.println(x.value + " " + size(x));
+        System.out.println(h.value + " " + size(h));
 		return x;
 	}
 	
@@ -91,16 +96,25 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		
 		x.color = h.color;
 		h.color = RED;
+        
+        x.size = h.size;
+        h.size =  1 + size(h.left) + size(h.right); //save x.size in a temp instead?
+        System.out.println("Right Rotation");
+        System.out.println(x.value + " " + size(x));
+        System.out.println(h.value + " " + size(h));
 		
 		return x;
 	}
 	
 	private boolean isRed(Node h) {
+        if (h == null) {
+            return false;
+        }
 		return (h.color == true);
 	}
     
-    public int getSize() {
-        return size;
+    public int size(Node h) {
+        return h.size;
     }
 	
 	private void flipColors(Node h) { //is there a more concise way to do this?
@@ -194,10 +208,6 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		
 	}
 	
-	private int size(Node x) { //number of nodes less than current node?
-		return x.size;
-		
-	}
 	
 	*/
 	
@@ -237,10 +247,9 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		test.put("x", 8);
 		test.put("a", 9);
 		test.put("m", 10);
-		System.out.println(test.get("s"));
-		System.out.println(test.get("e"));
-		System.out.println(test.get("a"));
-		System.out.println(test.get("m"));
-        System.out.println(test.get("s").getSize());
+		//System.out.println(test.get("s"));
+		//System.out.println(test.get("e"));
+		/* System.out.println(test.get("a"));
+		System.out.println(test.get("m")); */
 	}
 }
