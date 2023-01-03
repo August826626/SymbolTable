@@ -3,11 +3,11 @@ import java.util.ArrayList;
 public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generics
 	final boolean RED = true;
 	final boolean BLACK = false;
-	public Node root;
+	public Node root = null;
 	// how to make generic?
 
 	public SymbolTable() {
-		
+        
 	}
 	
 	public void put(Key k, Value v) { //need second method because we need to fix links
@@ -31,22 +31,27 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		} else { //if same
 			x.value = v; //change value
 		}
-		
-		/* if (isRed(x.right) && !isRed(x.left)) { //why does this work?
-			leftRot(x.left);
-		}
-		if (isRed(x.left) && !isRed(x.left.left)) {
-			rightRot(x.left);
-		}
-		if (isRed(x.left) && isRed(x.right)) {
-			flipColors(x);
-		} */
+		if (x.left != null) fixUp(x);
+		/* 
+		*/
 		
 		return x;
 		
 		
 		//x.add(); //where should I put this?
 	}
+    
+    private void fixUp(Node x) {
+        if (x.right != null && isRed(x.right) && !isRed(x.left)) { //why does this work?
+			leftRot(x.left);
+		}
+		if (x.left.left != null && isRed(x.left) && !isRed(x.left.left)) {
+			rightRot(x.left);
+		}
+		if (x.right != null && isRed(x.left) && isRed(x.right)) {
+			flipColors(x);
+        }
+    }
 	
 	
 	public Value get(Key k) {
@@ -91,7 +96,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 	}
 	
 	private boolean isRed(Node h) {
-		return h.color;
+		return (h.color == true);
 	}
 	
 	private void flipColors(Node h) { //is there a more concise way to do this?
