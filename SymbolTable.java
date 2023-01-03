@@ -98,6 +98,10 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 	private boolean isRed(Node h) {
 		return (h.color == true);
 	}
+    
+    public int getSize() {
+        return size;
+    }
 	
 	private void flipColors(Node h) { //is there a more concise way to do this?
 		if (h.color == RED) {
@@ -209,6 +213,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 			this.key = k;
 			this.value = v;
 			this.color = RED;
+            this.size = 1;
 		}
 		
 		public int compareTo(Node that) {
@@ -236,5 +241,6 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		System.out.println(test.get("e"));
 		System.out.println(test.get("a"));
 		System.out.println(test.get("m"));
+        System.out.println(test.get("s").getSize());
 	}
 }
