@@ -38,10 +38,10 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		return x;
 		
 		
-		//x.add(); //where should I put this?
 	}
     
-    private void fixUp(Node x) {
+    
+    private Node fixUp(Node x) {
         if (x.right != null && isRed(x.right) && !isRed(x.left)) { //why does this work?
 			leftRot(x.left);
 		}
@@ -51,6 +51,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		if (x.right != null && isRed(x.left) && isRed(x.right)) {
 			flipColors(x);
         }
+        return x;
     }
 	
 	public Value get(Key k) {
@@ -129,6 +130,39 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		}
 	}
 	
+    public void deleteMin() {
+        root = deleteMin(root);
+        root.color = BLACK;
+    }
+    
+    private Node deleteMin(Node h) {
+        if (h.left == null) return null; //when hit bottom, delete previous node
+        
+        if (!isRed(h.left) && !isRed(h.left.left)) { //two black in a row
+            h = moveRedLeft(h);
+        }
+        h.left = deleteMin(h.left);
+        return fixUp(h); //go back and fix moves, similar to put
+    }
+    
+    private Node moveRedLeft(Node h) { //move red to where it can be deleted
+        flipColors(h);
+        if (isRed(h.right.left)) {
+            h.right = rightRot(h.right);
+            h = leftRot(h);
+            flipColors(h);
+        }
+        return h;
+    }
+    
+   /*  private Node delete(Node h) {
+        Node x = h.left;
+        Node temp = x.left;
+        leftRot(h);
+        h.right = temp;
+        h.left = delete(h.left);
+    } */
+    
 	/* private Node max (Node x) {
 		while (x.right != null) {//as long as there is a child
 			x = x.right; //search right child
@@ -247,6 +281,8 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		test.put("x", 8);
 		test.put("a", 9);
 		test.put("m", 10);
+        System.out.println(test.get("a"));
+        test.deleteMin();
 		//System.out.println(test.get("s"));
 		//System.out.println(test.get("e"));
 		/* System.out.println(test.get("a"));
