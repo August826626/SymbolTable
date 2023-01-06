@@ -23,17 +23,16 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		
 		int comp = k.compareTo(x.key);
 		if (comp < 0) { //if less than
-            x.add();
 			x.left = put(x.left, k, v); //search left tree
 		} else if (comp > 0) { //if greater than
-            x.add();
 			x.right = put(x.right, k, v); //search right tree
 		} else { //if same
 			x.value = v; //change value
 		}
-		if (x.left != null) fixUp(x);
-		/* 
-		*/
+        
+		fixUp(x);
+        
+        x.size = size(x.left) + size(x.right) + 1;
 		
 		return x;
 		
@@ -42,15 +41,16 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
     
     
     private Node fixUp(Node x) {
-        if (x.right != null && isRed(x.right) && !isRed(x.left)) { //why does this work?
-			leftRot(x.left);
+        if (isRed(x.right) && !isRed(x.left)) { //why does this work?
+			leftRot(x);
 		}
-		if (x.left.left != null && isRed(x.left) && !isRed(x.left.left)) {
-			rightRot(x.left);
+		if (isRed(x.left) && isRed(x.left.left)) {
+			rightRot(x);
 		}
-		if (x.right != null && isRed(x.left) && isRed(x.right)) {
+		if (isRed(x.left) && isRed(x.right)) {
 			flipColors(x);
         }
+        
         return x;
     }
 	
@@ -84,9 +84,10 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         int temp = x.size;
         x.size = h.size;
         h.size = 1 + size(h.left) + size(h.right); //h size changing but it's childrens' sizes haven't
-        System.out.println("Left rotation");
-        System.out.println(x.value + " " + size(x));
-        System.out.println(h.value + " " + size(h));
+        
+        //System.out.println("Left rotation");
+        //System.out.println(x.value + " " + size(x));
+        //System.out.println(h.value + " " + size(h));
 		return x;
 	}
 	
@@ -100,9 +101,6 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         
         x.size = h.size;
         h.size =  1 + size(h.left) + size(h.right); //save x.size in a temp instead?
-        System.out.println("Right Rotation");
-        System.out.println(x.value + " " + size(x));
-        System.out.println(h.value + " " + size(h));
 		
 		return x;
 	}
@@ -111,10 +109,13 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         if (h == null) {
             return false;
         }
-		return (h.color == true);
+		return h.color;
 	}
     
     public int size(Node h) {
+        if (h == null) {
+            return 0;
+        }
         return h.size;
     }
 	
@@ -155,6 +156,23 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         return h;
     }
     
+    private Node delete(Node h, Key k) {
+        if (h == null) return null;
+        
+        int comp = k.compareTo(h.k);
+        if (comp < 0) {
+            if(!isRed(h.left) && !isRed(h.left.left() {
+                h = moveRedLeft(h);
+            }
+            h.left = delete(h.left, key);
+        } else {
+            if (isRed(h.left)) {
+                h.rightRot(h);
+            }
+        }
+        
+    }
+    
    /*  private Node delete(Node h) {
         Node x = h.left;
         Node temp = x.left;
@@ -177,9 +195,6 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		return x;
 	}
 	
-	public void deleteMin(Node x) {
-		return min(x).k;
-	}
 	
 	public void delete(Key k) {
 		root = delete(root, k);
@@ -267,6 +282,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		public void add() {
 			size += 1;
 		}
+        
 	} 
 	
 	public static void main(String[] args) {
