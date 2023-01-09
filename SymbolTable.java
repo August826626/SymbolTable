@@ -146,6 +146,15 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         return fixUp(h); //go back and fix moves, similar to put
     }
     
+    public Key min() {
+        return min(root).key;   
+    }
+    
+    private Node min(Node h) {
+        if (h.left == null) return h; //when hit bottom, return 
+        else return min(h.left);
+    }
+    
     private Node moveRedLeft(Node h) { //move red to where it can be deleted
         flipColors(h);
         if (isRed(h.right.left)) {
@@ -156,21 +165,45 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         return h;
     }
     
+    
+    private Node moveRedRight(Node h) { //move red to where it can be deleted
+        flipColors(h);
+        if (isRed(h.left.left)) {
+            h = rightRot(h);
+            flipColors(h);
+        }
+        return h;
+    }
+    
+    public void delete(Key k) {
+        root = delete(root, k);
+    }
+    
     private Node delete(Node h, Key k) {
         if (h == null) return null;
         
-        int comp = k.compareTo(h.k);
-        if (comp < 0) {
-            if(!isRed(h.left) && !isRed(h.left.left() {
-                h = moveRedLeft(h);
-            }
-            h.left = delete(h.left, key);
+        int comp = k.compareTo(h.key);
+        if (comp < 0) { //delete from left
+            h.left = delete(h.left, k);
+        } else if (comp > 0) {
+            h.right = delete(h.right, k);
         } else {
-            if (isRed(h.left)) {
-                h.rightRot(h);
+            if (h.right == null) {
+                return x.left;
+            }
+            if (x.left == null) { //switch min with root
+                return x.right;
+            }
+            
+                Node temp = h;
+                h = min(temp.right);
+                h.right = deleteMin(t.right);
+                h.left = temp.left;
+
             }
         }
-        
+        h.size = size(h.left) + size(h.right) + 1;
+        return h;
     }
     
    /*  private Node delete(Node h) {
@@ -298,7 +331,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		test.put("a", 9);
 		test.put("m", 10);
         System.out.println(test.get("a"));
-        test.deleteMin();
+        test.delete();
 		//System.out.println(test.get("s"));
 		//System.out.println(test.get("e"));
 		/* System.out.println(test.get("a"));
