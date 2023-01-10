@@ -18,6 +18,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 	
 	private Node put(Node x, Key k, Value v) {
 		if (x == null) {
+			System.out.println(k);
 			return new Node(k, v); //if nothing there, attach
 		}
 		
@@ -27,6 +28,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		} else if (comp > 0) { //if greater than
 			x.right = put(x.right, k, v); //search right tree
 		} else { //if same
+			
 			x.value = v; //change value
 		}
         
@@ -42,12 +44,18 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
     
     private Node fixUp(Node x) {
         if (isRed(x.right) && !isRed(x.left)) { //why does this work?
-			leftRot(x);
+			System.out.println("Left rot");
+			x = leftRot(x);
 		}
 		if (isRed(x.left) && isRed(x.left.left)) {
-			rightRot(x);
+			System.out.println("Right rot x=" + x.key);
+			x = rightRot(x);
+			
+		System.out.println("root=" + root.key);
+		System.out.println("x=" + x.key);
 		}
 		if (isRed(x.left) && isRed(x.right)) {
+			System.out.println("Flip colors");
 			flipColors(x);
         }
         
@@ -93,6 +101,9 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 	
 	public Node rightRot(Node h) {
 		Node x = h.left;
+		
+		System.out.println("x=" + x.key);
+		System.out.println("h=" + h.key);
 		h.left = x.right;
 		x.right = h;
 		
@@ -101,6 +112,7 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
         
         x.size = h.size;
         h.size =  1 + size(h.left) + size(h.right); //save x.size in a temp instead?
+		
 		
 		return x;
 	}
@@ -177,33 +189,47 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
     
     public void delete(Key k) {
         root = delete(root, k);
+		root.color = BLACK;
     }
     
     private Node delete(Node h, Key k) {
         if (h == null) return null;
         
         int comp = k.compareTo(h.key);
+		System.out.println(k);
+		System.out.println(h.key);
+		System.out.println(comp);
         if (comp < 0) { //delete from left
-            h.left = delete(h.left, k);
-        } else if (comp > 0) {
-            h.right = delete(h.right, k);
+			if (!isRed(h.left) && !isRed(h.left.left)) {
+				
+			System.out.println("Fix two black in a row " + h.key + "" + comp);
+				h = moveRedLeft(h);
+			}
+			System.out.println("Go left "+ h.key + ""  + comp);
+            h.left = delete(h.left, k); //issue?
         } else {
-            if (h.right == null) {
-                return x.left;
-            }
-            if (x.left == null) { //switch min with root
-                return x.right;
-            }
-            
-                Node temp = h;
-                h = min(temp.right);
-                h.right = deleteMin(t.right);
-                h.left = temp.left;
-
-            }
-        }
-        h.size = size(h.left) + size(h.right) + 1;
-        return h;
+			if (isRed(h.left)) {
+				
+			System.out.println("Fix left red"+ h.key + ""  + comp);
+				h = rightRot(h);
+			}
+			if (comp == 0 && h.right == null) {
+				return null;
+			}
+			if (!isRed(h.right) && !isRed(h.right.left)) {
+				h = moveRedRight(h);
+			}
+			if (comp == 0) {
+				h.value = get(h.right, min(h.right).key);
+				h.key = min(h.right).key;
+				h.right = deleteMin(h.right);
+			} else {
+				
+				System.out.println("Go right"+ h.key + ""  + comp);
+				h.right = delete(h.right, k);
+			}
+		}
+        return fixUp(h);
     }
     
    /*  private Node delete(Node h) {
@@ -330,8 +356,8 @@ public class SymbolTable<Key extends Comparable<Key>, Value> { //specify generic
 		test.put("x", 8);
 		test.put("a", 9);
 		test.put("m", 10);
-        System.out.println(test.get("a"));
-        test.delete();
+        System.out.println(test.get("e"));
+        test.delete("e");
 		//System.out.println(test.get("s"));
 		//System.out.println(test.get("e"));
 		/* System.out.println(test.get("a"));
